@@ -1,0 +1,16 @@
+.route-btn {
+  display: flex;
+  justify-content: start;
+  height: 40px;
+  padding: 5px 20px;
+}
+
+.route-btn:hover {
+  background-color: lightgray;
+}
+
+.title, .icon {
+  margin: auto 0;
+  padding: 5px
+}
+

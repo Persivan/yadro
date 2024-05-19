@@ -1,0 +1,11 @@
+<ng-container *ngFor="let option of sibebarOptions">
+
+  <mat-divider></mat-divider>
+  <a class="route-btn" [routerLink]="option.route">
+    <mat-icon class="icon"> {{option.icon}} </mat-icon>
+    <p class="title"> {{ option.title }} </p>
+  </a>
+  <mat-divider></mat-divider>
+
+
+</ng-container>

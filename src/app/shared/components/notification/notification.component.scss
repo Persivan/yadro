@@ -1,0 +1,34 @@
+.example-card {
+  max-width: 400px;
+  min-height: 100px;
+  min-width: 200px;
+}
+
+mat-card-content {
+  margin-top: 24px;
+}
+
+.mat-mdc-card-title-group {
+  justify-content: normal;
+}
+
+.icon-display {
+  display: flex;
+  padding: 10px;
+  transform: scale(2);
+}
+.success {
+  color:green;
+}
+
+.error {
+  color: #ff7575;
+}
+
+.warning {
+  color: #ffc107;
+}
+
+.info {
+  color: #6D42BA;
+}

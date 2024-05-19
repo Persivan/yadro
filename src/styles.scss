@@ -1,0 +1,16 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+$color-red: blue;
+
+:root {
+  --amber-500: #ffc107; /* Amber 500 */
+  --blue-500: #2196f3; /* Blue 500 */
+/* Add more colors to your palette as needed */
+}
+
+p {
+  font-family: 'Roboto', sans-serif;
+}

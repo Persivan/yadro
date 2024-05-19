@@ -1,0 +1,41 @@
+<div class="container">
+  <mat-card>
+    <mat-card-title>Авторизация</mat-card-title>
+    <mat-card-content>
+      <div class="login-container">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <mat-form-field>
+            <mat-label>Имя пользователя</mat-label>
+            <input matInput type="text" formControlName="username">
+            <button matSuffix mat-icon-button aria-label="Clear" *ngIf="loginForm.get('username')?.value" (click)="loginForm.get('username')?.setValue('')" class="wtf">
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('username')?.invalid && (loginForm.get('username')?.dirty || loginForm.get('username')?.touched)">
+              Имя пользователя <strong>обязательно</strong>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Пароль</mat-label>
+            <input matInput type="password" formControlName="password">
+            <button matSuffix mat-icon-button aria-label="Clear" *ngIf="loginForm.get('password')?.value" (click)="loginForm.get('password')?.setValue('')">
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
+              Пароль <strong>обязателен</strong>
+            </mat-error>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">Войти</button>
+
+        </form>
+        <div class="links">
+          <a routerLink="reset-password">Забыли пароль?</a>
+          <span class="separator"></span>
+          <a routerLink="register">Регистрация</a>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
