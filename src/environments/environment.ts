@@ -1,4 +1,4 @@
 export const environment = {
-  apiUrl: 'http://localhost:3001/',
-  currencyApiUrl: 'http://localhost:3000/',
+  apiUrl: 'http://89.109.8.173:3001/',
+  currencyApiUrl: 'http://89.109.8.173:3000/',
 };
