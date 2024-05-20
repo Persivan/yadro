@@ -1,4 +1,4 @@
 export const environment = {
-  apiUrl: 'http://89.109.8.173:3001/',
-  currencyApiUrl: 'http://89.109.8.173:3000/',
+  apiUrl: 'https://dev-api1.eventurika.net/',
+  currencyApiUrl: 'https://dev-api2.eventurika.net/',
 };
