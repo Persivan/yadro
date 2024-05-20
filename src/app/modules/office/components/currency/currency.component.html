@@ -1,0 +1,45 @@
+<div class="demo-button-container" style="width: 100%">
+  <mat-form-field>
+    <mat-label>Валюты</mat-label>
+    <mat-select [formControl]="displayedCurrencies" multiple (selectionChange)="currenciesChanged($event.value)">
+      @for (currency of currenciesList; track currency) {
+        <mat-option [value]="currency">{{currency}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<table mat-table [dataSource]="selectedCurrencies" class="mat-elevation-z8 demo-table">
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef >Валюта</th>
+    <td mat-cell *matCellDef="let element" class="name upper-case">{{element.name}}</td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="value">
+    <th mat-header-cell *matHeaderCellDef>Цена</th>
+    <td mat-cell *matCellDef="let element" class="value">{{element.value / 100}}</td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="change">
+    <th mat-header-cell *matHeaderCellDef>Тренд</th>
+    <td mat-cell *matCellDef="let element" class="trand">
+      <mat-icon *ngIf="element.diffValue > 0">trending_up</mat-icon>
+      <mat-icon *ngIf="element.diffValue == 0">trending_flat</mat-icon>
+      <mat-icon *ngIf="element.diffValue < 0">trending_down</mat-icon>
+    </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="diffValue">
+    <th mat-header-cell *matHeaderCellDef>Изменение</th>
+    <td mat-cell *matCellDef="let element" class="diff">({{ (element.diffValue > 0 ? '+' : '') + (element.diffValue / 100) }})</td>
+  </ng-container>
+
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+</table>

@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--mdc-elevated-card-container-color);
+  padding-top: 20px;
+  padding-bottom: 20px;
+  height: 100vh
+}
+
+.office {
+  width: calc(100% - 300px);
+  min-width: 150px;
+  justify-content: center;
+  padding: 20px 10px;
+}
+
+app-board {
+  width: 100%
+}
+
+
