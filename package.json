@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "concurrently \"npm run server\" \"npm run client\" \"npm run server_currency\"",
-    "server": "json-server --watch db.json --port 3001",
+    "server": "json-server --watch back-end/db.json --port 3001",
     "server_currency": "node back-end/expres.js",
     "client": "ng serve",
     "build": "ng build",

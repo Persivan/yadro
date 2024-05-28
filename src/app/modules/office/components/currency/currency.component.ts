@@ -55,7 +55,9 @@ export class CurrencyComponent implements OnInit {
     return this.currencies.map(currency => currency.name);
   }
 
-
+  /**
+   * Запрос новой цены для всех валют в списке
+   */
   updateValues() {
     this.currencies.forEach((currency) => {
       if (!currency.selected) return;
@@ -76,7 +78,11 @@ export class CurrencyComponent implements OnInit {
     })
   }
 
-  currenciesChanged(data: any) {
+  /**
+   * Обработчик выбора новых валют в выпадающем списке
+   * @param data массив кодов валюты
+   */
+  currenciesChanged(data: string[]) {
     // Обновление свойства selected в этом массиве
     this.currencies.forEach(currency => {
       currency.selected = !!data.includes(currency.name);
