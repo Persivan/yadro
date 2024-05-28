@@ -1,11 +1,12 @@
 import {Component, DestroyRef, inject, OnInit, ViewChild} from '@angular/core';
 import {MatTable} from "@angular/material/table";
 import {currencyInterface} from "../../types/currencyInterface";
-import {CurrencyService} from "../../services/currency.service";
 import {DialogService, NotificationTypes} from "../../../../shared/services/dialog.service";
-import {interval, take} from "rxjs";
+import {interval, map, take} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {FormControl} from "@angular/forms";
+import {CurrencyExtService} from "../../services/currencyExt.service";
+import {CurrencyDataService} from "../../services/currencyData.service";
 
 @Component({
   selector: 'app-currency',
@@ -18,24 +19,35 @@ export class CurrencyComponent implements OnInit {
 
   currencies: currencyInterface[] = [];
 
-  displayedCurrencies = new FormControl(['usd', 'eur', 'gbr']);
+  displayedCurrencies = new FormControl(['USD', 'EUR', 'GBP']);
 
   displayedColumns: string[] = ['name', 'value', 'change', 'diffValue'];
 
 
   constructor(
-    private currencyService: CurrencyService,
+    private currencyExtService: CurrencyExtService,
+    private currencyDataService: CurrencyDataService,
     private dialogService: DialogService,
   ) {
   }
 
   ngOnInit() {
-    this.currencyService.getStartValues()
+    // Получаем статус внешней API
+    this.currencyExtService.getStatus()
       .pipe(take(1))
       .subscribe({
-        next: (values) => this.currencies = values,
-        error: () => this.dialogService.notify("Произошла ошибка при получение данных о валютах", NotificationTypes.error)
+        next: data => {
+          if (data.quotas.month.remaining === 0) {
+            this.dialogService.notify("На внешней api конвертации закончились средства", NotificationTypes.error);
+          }
+        },
+        error: () => {
+          this.dialogService.notify("Произошла ошибка при получение данных с внешней api", NotificationTypes.error)
+        }
       })
+
+    // Получаем список поддерживаемых валют
+    this.currencies = this.currencyDataService.getSupportedCurrencies()
 
     this.updateValues(); // Получаем первые значения
     // Получаем каждые 5 секунд значения
@@ -59,23 +71,31 @@ export class CurrencyComponent implements OnInit {
    * Запрос новой цены для всех валют в списке
    */
   updateValues() {
-    this.currencies.forEach((currency) => {
-      if (!currency.selected) return;
+    if (!this.displayedCurrencies.value) {
+      this.dialogService.notify("Произошла ошибка", NotificationTypes.error)
+      return;
+    }
 
-      this.currencyService.convertCurrency({
-        currencyStart: "rub",
-        currencyEnd: currency.name,
-        currencyEndValue: 100
+    this.currencyExtService.getCurrencies(this.displayedCurrencies.value)
+      .pipe(
+        take(1),
+        map(res => this.currencyDataService.convertCurrencyValues(res))
+      )
+      .subscribe({
+        next: (res) => {
+          console.log(1, res.data)
+          console.log(2, this.currencies)
+
+          this.currencies.forEach((currency: currencyInterface) => {
+            if (res.data[currency.name]) {
+              currency.diffValue = res.data[currency.name].value - currency.value;
+              currency.value = res.data[currency.name].value;
+            }
+          });
+
+        },
+        error: () => this.dialogService.notify("Произошла ошибка при получение данных о валютах", NotificationTypes.error)
       })
-        .pipe(take(1))
-        .subscribe({
-          next: (res) => {
-            currency.diffValue = parseInt(res.currencyStartValue) - currency.value;
-            currency.value = parseInt(res.currencyStartValue)
-          },
-          error: () => this.dialogService.notify("Произошла ошибка при получение данных о валютах", NotificationTypes.error)
-        })
-    })
   }
 
   /**

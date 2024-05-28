@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {UserInterface} from "../../types/User.interface";
-import {AuthService} from "../../../auth/services/auth.service";
 import {DialogService, NotificationTypes} from "../../../../shared/services/dialog.service";
 import {take} from "rxjs";
+import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-profile',
@@ -13,7 +13,7 @@ export class ProfileComponent implements OnInit {
   currentUser!: UserInterface;
 
   constructor(
-    private authService: AuthService,
+    private userService: UserService,
     private dialogService: DialogService,
   ) {
   }
@@ -33,7 +33,7 @@ export class ProfileComponent implements OnInit {
     dialogRef.afterClosed().pipe(take(1))
       .subscribe((apply) => {
         if (apply) {
-          this.authService.logout();
+          this.userService.logout();
         }
       })
   }

@@ -1,26 +1,23 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, map, mergeMap, Observable, of, switchMap} from "rxjs";
+import {catchError, map, Observable, of, switchMap} from "rxjs";
 import {environment} from "../../../../environments/environment";
 import {UserAuthInterface} from "../types/userAuthInterface";
-import {Router} from "@angular/router";
+import {UserService} from "./user.service";
 
 // В проде эндпоинты будут отличаться
-const CHECK_USERNAME = 'users'
 const LOGIN_USER = 'users'
 const REGISTER_USER = 'users'
 const RESET_PASSWORD = 'users'
-const GET_USER_ID = 'users' // Костыль, т.к. json не может использовать в качестве первичного ключа username, нам нужен id
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
-  ) { }
+    private userService: UserService,
+  ) {
+  }
 
 
   /**
@@ -34,8 +31,8 @@ export class AuthService {
       .pipe(
         map(users => {
           if (users.length === 1) {
-            // Пользователь найден, вход успешен
-            localStorage.setItem('currentUser', JSON.stringify(users[0]));
+            // Пользователь найден, сохраним его перс. данные
+            this.userService.setCurrentUser(users[0])
             return true;
           } else {
             // Пользователь не найден или неверные учетные данные
@@ -58,27 +55,28 @@ export class AuthService {
   register(user: UserAuthInterface): Observable<boolean> {
     const fullUrl = environment.apiUrl + REGISTER_USER;
     // Проверка, занято ли имя пользователя
-    return this.isUsernameTaken(user.username).pipe(
-      switchMap(usernameTaken => {
-        if (usernameTaken) {
-          // Имя пользователя уже используется
-          return of(false);
-        } else {
-          // Имя пользователя доступно, приступаем к регистрации
-          return this.http.post<UserAuthInterface>(fullUrl, user).pipe(
-            map(user => {
-              console.log(1, user);
-              // Предполагая успешную регистрацию, возвращается созданный пользователь.
-              return !!(user && user.id);
-            }),
-            catchError(() => {
-              // Обработка ошибок
-              return of(false);
-            })
-          );
-        }
-      })
-    );
+    return this.userService.isUsernameTaken(user.username)
+      .pipe(
+        switchMap(usernameTaken => {
+          if (usernameTaken) {
+            // Имя пользователя уже используется
+            return of(false);
+          } else {
+            // Имя пользователя доступно, приступаем к регистрации
+            return this.http.post<UserAuthInterface>(fullUrl, user)
+              .pipe(
+                map(user => {
+                  // Предполагая успешную регистрацию, возвращается созданный пользователь.
+                  return !!(user && user.id);
+                }),
+                catchError(() => {
+                  // Обработка ошибок
+                  return of(false);
+                })
+              );
+          }
+        })
+      );
   }
 
   /**
@@ -89,46 +87,17 @@ export class AuthService {
   resetPassword(user: UserAuthInterface): Observable<boolean> {
     // Т.к. json-server работает с id, а смена пароля должна происходить по username, то напишем немного логики бэка
     // которая достает id по username и уже потом патчит соответвующую учетку
-    const fullUrlForGetUserId = environment.apiUrl + GET_USER_ID;
     const fullUrl = environment.apiUrl + RESET_PASSWORD;
-    return this.http.get<UserAuthInterface[]>(`${fullUrlForGetUserId}?username=${user.username}`).pipe(
-      mergeMap(users => {
-        if (users.length === 1) {
-          const userId = users[0].id;
-          return this.http.patch<UserAuthInterface>(`${fullUrl}/${userId}`, { password: user.password }).pipe(
-            map(response => true),
+    return this.userService.getUserIdByUsername(user.username).pipe(
+      switchMap(userId => {
+        if (userId) {
+          return this.http.patch(fullUrl, { password: user.password }).pipe(
+            map(() => true),
             catchError(() => of(false))
           );
         } else {
           return of(false);
         }
-      }),
-      catchError(() => of(false))
-    );
-  }
-
-
-  /**
-   * Выход из учетной записи пользователя.
-   */
-  logout(): void {
-    // Удаление пользователя из локального хранилища, чтобы выйти из системы.
-    localStorage.removeItem('currentUser');
-    this.router.navigateByUrl('/auth');
-  }
-
-  /**
-   * Проверяет, занято ли указанное имя пользователя.
-   * @param username - имя пользователя для проверки
-   * @returns Observable<boolean> - возвращает true, если имя пользователя занято, false в противном случае или при ошибке
-   */
-  private isUsernameTaken(username: string): Observable<boolean> {
-    const fullUrl = environment.apiUrl + CHECK_USERNAME;
-    return this.http.get<UserAuthInterface[]>(`${fullUrl}?username=${username}`).pipe(
-      map(users => users.length > 0),
-      catchError(() => {
-        // Обработка ошибок
-        return of(false);
       })
     );
   }

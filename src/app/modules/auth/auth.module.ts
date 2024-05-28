@@ -11,6 +11,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatChipsModule} from '@angular/material/chips';
 import {MatCard, MatCardContent, MatCardModule, MatCardTitle} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
+import {AuthService} from "./services/auth.service";
 
 export const MODULE_ROUTE = 'auth';
 
@@ -49,6 +50,7 @@ const routes: Routes = [
     MatCardContent,
     MatIcon,
     MatCardModule
-  ]
+  ],
+  providers: [AuthService]
 })
 export class AuthModule { }

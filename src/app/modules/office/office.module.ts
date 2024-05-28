@@ -15,6 +15,9 @@ import {MatDividerModule} from "@angular/material/divider";
 import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {UserService} from "./services/user.service";
+import {CurrencyExtService} from "./services/currencyExt.service";
+import {CurrencyDataService} from "./services/currencyData.service";
 
 export const MODULE_ROUTE = 'office';
 
@@ -52,6 +55,11 @@ const routes: Routes = [
     ReactiveFormsModule,
     MatSelectModule,
     MatFormFieldModule
+  ],
+  providers: [
+    UserService,
+    CurrencyExtService,
+    CurrencyDataService
   ]
 })
 export class OfficeModule { }
